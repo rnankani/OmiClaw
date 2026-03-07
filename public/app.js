@@ -1,0 +1,266 @@
+// ─── WebSocket Connection ─────────────────────────────────────────
+const wsUrl = `ws://${location.host}`;
+let ws;
+let reconnectTimer;
+
+function connect() {
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => {
+    console.log('[ws] connected');
+    clearTimeout(reconnectTimer);
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const { type, data } = JSON.parse(event.data);
+      handleMessage(type, data);
+    } catch (err) {
+      console.error('[ws] parse error:', err);
+    }
+  };
+
+  ws.onclose = () => {
+    console.log('[ws] disconnected');
+    updateStatus(false);
+    reconnectTimer = setTimeout(connect, 2000);
+  };
+}
+
+// ─── Message Handlers ─────────────────────────────────────────────
+function handleMessage(type, data) {
+  switch (type) {
+    case 'state':
+      applyState(data);
+      break;
+
+    case 'status':
+      updateStatus(data.connected);
+      break;
+
+    case 'transcript':
+      handleTranscript(data);
+      break;
+
+    case 'command':
+      addMessage('system', `"Hey Claw, ${data.text}"`);
+      break;
+
+    case 'response':
+      // Final response handled via transcript final
+      break;
+
+    case 'audio':
+      playAudio(data.base64, data.mimeType);
+      break;
+
+    case 'photo':
+      showPhoto(data.base64);
+      break;
+
+    case 'parsed':
+      updateParsed(data);
+      break;
+
+    case 'call':
+      updateCallStatus(data);
+      break;
+
+    case 'error':
+      addMessage('system', `Error: ${data.message}`);
+      break;
+  }
+}
+
+function applyState(state) {
+  updateStatus(state.connected);
+  if (state.lastPhoto) showPhoto(state.lastPhoto);
+  if (state.lastParsedDetails) updateParsed(state.lastParsedDetails);
+  if (state.lastTranscript) {
+    addMessage('user', state.lastTranscript);
+  }
+  if (state.lastResponse) {
+    addMessage('assistant', state.lastResponse);
+  }
+}
+
+// ─── UI Updates ───────────────────────────────────────────────────
+const statusEl = document.getElementById('status');
+const messagesEl = document.getElementById('messages');
+const cameraImg = document.getElementById('camera-img');
+const cameraPlaceholder = document.getElementById('camera-placeholder');
+const dotGateway = document.getElementById('dot-gateway');
+const dotOmi = document.getElementById('dot-omi');
+const dotCall = document.getElementById('dot-call');
+const callStatusText = document.getElementById('call-status-text');
+const callResult = document.getElementById('call-result');
+
+function updateStatus(connected) {
+  statusEl.textContent = connected ? 'Connected' : 'Disconnected';
+  statusEl.className = `status ${connected ? 'connected' : 'disconnected'}`;
+  dotGateway.className = `status-dot ${connected ? 'active' : 'off'}`;
+}
+
+let streamingMsgEl = null;
+
+function handleTranscript(data) {
+  if (data.role === 'user') {
+    // Mark Omi as active
+    dotOmi.className = 'status-dot active';
+    addMessage('user', data.text);
+  } else if (data.role === 'assistant') {
+    if (data.streaming) {
+      // Update or create streaming message
+      if (!streamingMsgEl) {
+        streamingMsgEl = document.createElement('div');
+        streamingMsgEl.className = 'msg assistant streaming';
+        messagesEl.appendChild(streamingMsgEl);
+      }
+      streamingMsgEl.textContent = data.text;
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    } else {
+      // Final message - replace streaming
+      if (streamingMsgEl) {
+        streamingMsgEl.remove();
+        streamingMsgEl = null;
+      }
+      addMessage('assistant', data.text);
+    }
+  }
+}
+
+function addMessage(role, text) {
+  // Remove streaming indicator if present
+  if (role === 'assistant' && streamingMsgEl) {
+    streamingMsgEl.remove();
+    streamingMsgEl = null;
+  }
+
+  const msg = document.createElement('div');
+  msg.className = `msg ${role}`;
+  msg.textContent = text;
+  messagesEl.appendChild(msg);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  // Keep only last 50 messages
+  while (messagesEl.children.length > 50) {
+    messagesEl.removeChild(messagesEl.firstChild);
+  }
+}
+
+function showPhoto(base64) {
+  cameraPlaceholder.classList.add('hidden');
+  cameraImg.classList.remove('hidden');
+  // Add data URI prefix if not present
+  if (!base64.startsWith('data:')) {
+    base64 = `data:image/jpeg;base64,${base64}`;
+  }
+  cameraImg.src = base64;
+}
+
+function updateParsed(data) {
+  const rEl = document.getElementById('detail-restaurant');
+  const tEl = document.getElementById('detail-time');
+  const pEl = document.getElementById('detail-party');
+
+  if (data.restaurant) {
+    rEl.textContent = data.restaurant;
+    rEl.className = 'detail-value active';
+  }
+  if (data.time) {
+    tEl.textContent = data.time;
+    tEl.className = 'detail-value active';
+  }
+  if (data.partySize) {
+    pEl.textContent = `${data.partySize} people`;
+    pEl.className = 'detail-value active';
+  }
+}
+
+function updateCallStatus(data) {
+  const { status, summary, success, message } = data;
+
+  switch (status) {
+    case 'initiating':
+      dotCall.className = 'status-dot calling';
+      callStatusText.textContent = 'Phone Call: Initiating...';
+      break;
+
+    case 'in-progress':
+    case 'ringing':
+      dotCall.className = 'status-dot calling';
+      callStatusText.textContent = 'Phone Call: In Progress...';
+      break;
+
+    case 'ended':
+      dotCall.className = `status-dot ${success ? 'active' : 'error'}`;
+      callStatusText.textContent = success ? 'Phone Call: Completed' : 'Phone Call: Failed';
+      if (summary) {
+        callResult.textContent = summary;
+        callResult.className = `call-result show ${success ? '' : 'error'}`;
+      }
+      break;
+
+    case 'error':
+      dotCall.className = 'status-dot error';
+      callStatusText.textContent = 'Phone Call: Error';
+      callResult.textContent = message || 'Unknown error';
+      callResult.className = 'call-result show error';
+      break;
+
+    case 'timeout':
+      dotCall.className = 'status-dot error';
+      callStatusText.textContent = 'Phone Call: Timed Out';
+      break;
+
+    default:
+      callStatusText.textContent = `Phone Call: ${status}`;
+  }
+}
+
+// ─── Audio Playback ───────────────────────────────────────────────
+function playAudio(base64, mimeType) {
+  try {
+    const audio = new Audio(`data:${mimeType || 'audio/mpeg'};base64,${base64}`);
+    audio.volume = 1.0;
+    audio.play().catch(err => {
+      console.error('[audio] playback failed:', err);
+    });
+  } catch (err) {
+    console.error('[audio] error:', err);
+  }
+}
+
+// ─── Test Controls ────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 't' && !e.target.matches('input')) {
+    document.getElementById('test-controls').classList.toggle('hidden');
+  }
+});
+
+document.getElementById('test-send').addEventListener('click', sendTestCommand);
+document.getElementById('test-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendTestCommand();
+});
+
+async function sendTestCommand() {
+  const input = document.getElementById('test-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  addMessage('user', text);
+
+  try {
+    await fetch('/test/command', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+  } catch (err) {
+    addMessage('system', `Send failed: ${err.message}`);
+  }
+}
+
+// ─── Init ─────────────────────────────────────────────────────────
+connect();

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmiClaw</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>OmiClaw</h1>
+    <span class="tagline">ask once, and it gets done.</span>
+    <span class="status" id="status">Connecting...</span>
+  </header>
+
+  <div class="grid">
+    <!-- Camera Feed -->
+    <div class="panel" id="panel-camera">
+      <div class="panel-header">Camera Feed</div>
+      <div class="panel-body" id="camera-body">
+        <div class="placeholder" id="camera-placeholder">Waiting for Omi glasses photo...</div>
+        <img id="camera-img" class="hidden" alt="Latest photo from Omi glasses">
+      </div>
+    </div>
+
+    <!-- Transcript -->
+    <div class="panel" id="panel-transcript">
+      <div class="panel-header">Live Transcript</div>
+      <div class="panel-body" id="transcript-body">
+        <div class="messages" id="messages"></div>
+      </div>
+    </div>
+
+    <!-- Parsed Details -->
+    <div class="panel" id="panel-parsed">
+      <div class="panel-header">Parsed Details</div>
+      <div class="panel-body" id="parsed-body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Restaurant</span>
+            <span class="detail-value" id="detail-restaurant">--</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Time</span>
+            <span class="detail-value" id="detail-time">--</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Party Size</span>
+            <span class="detail-value" id="detail-party">--</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status / Result -->
+    <div class="panel" id="panel-status">
+      <div class="panel-header">Status</div>
+      <div class="panel-body" id="status-body">
+        <div class="status-items" id="status-items">
+          <div class="status-row">
+            <span class="status-dot" id="dot-gateway"></span>
+            <span>OpenClaw Gateway</span>
+          </div>
+          <div class="status-row">
+            <span class="status-dot off" id="dot-omi"></span>
+            <span>Omi Glasses</span>
+          </div>
+          <div class="status-row">
+            <span class="status-dot off" id="dot-call"></span>
+            <span id="call-status-text">Phone Call: Idle</span>
+          </div>
+        </div>
+        <div class="call-result" id="call-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Controls (hidden during demo, toggle with T key) -->
+  <div class="test-controls hidden" id="test-controls">
+    <input type="text" id="test-input" placeholder="Type a command (e.g. What am I holding?)">
+    <button id="test-send">Send</button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
