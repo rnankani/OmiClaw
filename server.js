@@ -200,8 +200,8 @@ function handleChatEvent(payload) {
       }
     }
 
-    // Parse reservation details from response
-    const details = parseReservationDetails(finalText);
+    // Parse dynamic details from response and user transcript
+    const details = parseDynamicDetails(state.lastTranscript, finalText);
     if (details) {
       state.lastParsedDetails = details;
       broadcast('parsed', details);
@@ -579,24 +579,43 @@ async function speakViaElevenLabs(text) {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────
-function parseReservationDetails(text) {
-  const lower = text.toLowerCase();
-  if (!lower.includes('reserv') && !lower.includes('book') && !lower.includes('table')) {
-    return null;
+function parseDynamicDetails(userText, aiText) {
+  const combined = `${userText || ''} ${aiText || ''}`.trim();
+  if (!combined) return null;
+
+  const lower = combined.toLowerCase();
+  const details = {};
+
+  if (lower.match(/reserv|book|table/)) {
+    details.Intent = 'Reservation';
+    details.Location = lower.match(/(?:at|for|to)\s+([a-z'\s]+?)(?:\s+(?:for|at|to|on)\s|[0-9]|$)/i)?.[1]?.trim() || 'Pending...';
+    details.Time = lower.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i)?.[1] || 'Pending...';
+  } else if (lower.match(/weather|temperature|rain|forecast/)) {
+    details.Intent = 'Weather';
+    details.Location = lower.match(/(?:in|for|at)\s+([a-z\s]+?)(?:today|tomorrow|$)/i)?.[1]?.trim() || 'Local';
+  } else if (lower.match(/schedule|meeting|calendar|remind/)) {
+    details.Intent = 'Calendar';
+    details.Subject = lower.match(/(?:to|about)\s+([a-z\s]+?)(?:\s+(?:at|on|tomorrow|today)|$)/i)?.[1]?.trim() || 'Pending...';
+    details.Time = lower.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i)?.[1] || 'Pending...';
+  } else if (lower.match(/uber|lyft|ride|drive|taxi/)) {
+    details.Intent = 'Transportation';
+    details.Destination = lower.match(/(?:to)\s+([a-z\s]+?)(?:\s+(?:from|at|now)|$)/i)?.[1]?.trim() || 'Pending...';
+  } else {
+    details.Intent = 'Analysis';
+    if (userText) {
+        const words = userText.split(' ').filter(w => w.length > 4);
+        if (words.length > 0) details.Topic = words[0];
+    }
   }
 
-  const restaurant = text.match(/(?:at|for)\s+([A-Z][A-Za-z'\s]+?)(?:\s+(?:for|at|to)\s)/)?.[1]?.trim();
-  const time = text.match(/(?:at|for)\s+(\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm)?)/)?.[1];
-  const partySize = text.match(/(?:for\s+)?(\d+)\s*(?:people|person|guests?|of us)/)?.[1];
-
-  if (restaurant || time || partySize) {
-    return {
-      restaurant: restaurant || null,
-      time: time || null,
-      partySize: partySize ? parseInt(partySize) : null,
-    };
+  // Capitalize values
+  for (const k in details) {
+    if (typeof details[k] === 'string') {
+      details[k] = details[k].replace(/\b\w/g, l => l.toUpperCase());
+    }
   }
-  return null;
+
+  return Object.keys(details).length > 0 ? details : null;
 }
 
 // ─── Health / Debug ───────────────────────────────────────────────

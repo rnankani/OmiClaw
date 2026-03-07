@@ -165,21 +165,39 @@ function showPhoto(base64) {
 }
 
 function updateParsed(data) {
-  const rEl = document.getElementById('detail-restaurant');
-  const tEl = document.getElementById('detail-time');
-  const pEl = document.getElementById('detail-party');
+  const grid = document.getElementById('parsed-grid');
+  if (!grid || !data) return;
 
-  if (data.restaurant) {
-    rEl.textContent = data.restaurant;
-    rEl.className = 'detail-value active';
+  grid.innerHTML = ''; // clear placeholder/existing
+  
+  // Backwards compatibility for exact vapi call payload
+  let displayData = { ...data };
+  if (data.restaurant || data.partySize) {
+    displayData = {
+      'Intent': 'Reservation',
+      'Location': data.restaurant,
+      'Time': data.time,
+      'Party': data.partySize ? `${data.partySize} people` : null
+    };
   }
-  if (data.time) {
-    tEl.textContent = data.time;
-    tEl.className = 'detail-value active';
-  }
-  if (data.partySize) {
-    pEl.textContent = `${data.partySize} people`;
-    pEl.className = 'detail-value active';
+
+  for (const [key, value] of Object.entries(displayData)) {
+    if (!value) continue;
+    
+    const item = document.createElement('div');
+    item.className = 'detail-item';
+    
+    const label = document.createElement('span');
+    label.className = 'detail-label';
+    label.textContent = key;
+    
+    const val = document.createElement('span');
+    val.className = 'detail-value active';
+    val.textContent = value;
+    
+    item.appendChild(label);
+    item.appendChild(val);
+    grid.appendChild(item);
   }
 }
 
