@@ -1,7 +1,8 @@
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
-const { WebSocketServer, WebSocket } = require('ws');
+// WebSocket only used for OpenClaw gateway (not UI)
+const { WebSocket } = require('ws');
 const crypto = require('crypto');
 const path = require('path');
 
@@ -23,21 +24,29 @@ const state = {
   lastUid: null,           // Last Omi user ID
 };
 
-// ─── Judge UI WebSocket ───────────────────────────────────────────
-const wss = new WebSocketServer({ server });
-const uiClients = new Set();
+// ─── Judge UI via SSE (works through Cloudflare tunnel) ──────────
+const sseClients = new Set();
 
-wss.on('connection', (ws) => {
-  uiClients.add(ws);
-  // Send current state on connect
-  ws.send(JSON.stringify({ type: 'state', data: state }));
-  ws.on('close', () => uiClients.delete(ws));
+app.get('/events', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+  res.write(`data: ${JSON.stringify({ type: 'state', data: state })}\n\n`);
+  sseClients.add(res);
+  // Heartbeat every 20s to prevent Cloudflare 524 timeout
+  const heartbeat = setInterval(() => {
+    try { res.write(': ping\n\n'); } catch (e) { clearInterval(heartbeat); }
+  }, 20000);
+  req.on('close', () => { sseClients.delete(res); clearInterval(heartbeat); });
 });
 
 function broadcast(type, data) {
-  const msg = JSON.stringify({ type, data });
-  for (const ws of uiClients) {
-    if (ws.readyState === WebSocket.OPEN) ws.send(msg);
+  const msg = `data: ${JSON.stringify({ type, data })}\n\n`;
+  for (const res of sseClients) {
+    try { res.write(msg); } catch (e) { sseClients.delete(res); }
   }
 }
 
@@ -262,7 +271,7 @@ function sendToOpenClaw(text, attachments) {
 }
 
 // ─── Omi Webhook Handlers ─────────────────────────────────────────
-app.post('/omi/transcript', async (req, res) => {
+app.post(['/omi/transcript', '/omi/webhook'], async (req, res) => {
   try {
     const { segments } = req.body;
     const uid = req.query.uid || 'default';

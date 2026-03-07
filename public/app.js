@@ -1,29 +1,27 @@
-// ─── WebSocket Connection ─────────────────────────────────────────
-const wsUrl = `ws://${location.host}`;
-let ws;
-let reconnectTimer;
+// ─── SSE Connection (works through Cloudflare tunnel) ────────────
+let es;
 
 function connect() {
-  ws = new WebSocket(wsUrl);
+  es = new EventSource('/events');
 
-  ws.onopen = () => {
-    console.log('[ws] connected');
-    clearTimeout(reconnectTimer);
+  es.onopen = () => {
+    console.log('[sse] connected');
   };
 
-  ws.onmessage = (event) => {
+  es.onmessage = (event) => {
     try {
       const { type, data } = JSON.parse(event.data);
       handleMessage(type, data);
     } catch (err) {
-      console.error('[ws] parse error:', err);
+      console.error('[sse] parse error:', err);
     }
   };
 
-  ws.onclose = () => {
-    console.log('[ws] disconnected');
+  es.onerror = () => {
+    console.log('[sse] error/disconnected, reconnecting...');
     updateStatus(false);
-    reconnectTimer = setTimeout(connect, 2000);
+    es.close();
+    setTimeout(connect, 2000);
   };
 }
 
