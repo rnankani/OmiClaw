@@ -260,12 +260,11 @@ h1 {
 
 /* Reasoning Sidebar Drawer (Slides from Right using Transform) */
 .reasoning-drawer-wrapper {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0; 
   transform: translateX(100%); /* Off-canvas initially */
-  width: 90%;
-  max-width: 350px;
+  width: 85%;
   height: 100dvh;
   /* Premium Glassmorphism */
   background: rgba(255, 255, 255, 0.75);
