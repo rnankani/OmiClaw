@@ -2,8 +2,6 @@
 
 OmiClaw is a single-column, mobile-first AI Agent dashboard designed to run seamlessly in any browser. It bridges Omi Smart Glasses with the OpenClaw architecture, Vapi for AI voice calls, and ElevenLabs for text-to-speech, acting as a complete hub for your personal AI assistant.
 
-![OmiClaw Light Theme](./public/low_cortisol.png) *(Representing the Low Cortisol Theme)*
-
 ## ✨ Features
 
 - **Mobile-First & App-Like**: A highly responsive, single-column flex layout designed with an Apple-esque aesthetic using soft ivories, deep greys, and muted gold accents.
