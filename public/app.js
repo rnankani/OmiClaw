@@ -95,8 +95,16 @@ const callResult = document.getElementById('call-result');
 
 function updateStatus(connected) {
   statusEl.textContent = connected ? 'Connected' : 'Disconnected';
-  statusEl.className = `status ${connected ? 'connected' : 'disconnected'}`;
-  dotGateway.className = `status-dot ${connected ? 'active' : 'off'}`;
+  statusEl.className = `status-text ${connected ? 'connected' : 'disconnected'}`;
+  
+  const headerDot = document.getElementById('header-status-dot');
+  if (headerDot) {
+      headerDot.className = `status-dot ${connected ? 'active' : 'disconnected'}`;
+  }
+  
+  if (dotGateway) {
+    dotGateway.className = `status-dot ${connected ? 'active' : 'off'}`;
+  }
 }
 
 let streamingMsgEl = null;
@@ -229,12 +237,18 @@ function playAudio(base64, mimeType) {
   }
 }
 
-// ─── Test Controls ────────────────────────────────────────────────
-document.addEventListener('keydown', (e) => {
-  if (e.key === 't' && !e.target.matches('input')) {
-    document.getElementById('test-controls').classList.toggle('hidden');
-  }
-});
+// ─── Reasoning Drawer ─────────────────────────────────────────────
+const reasoningToggle = document.getElementById('reasoning-toggle');
+if (reasoningToggle) {
+  reasoningToggle.addEventListener('click', () => {
+    const wrapper = document.querySelector('.reasoning-drawer-wrapper');
+    if (wrapper.classList.contains('open')) {
+      wrapper.classList.remove('open');
+    } else {
+      wrapper.classList.add('open');
+    }
+  });
+}
 
 document.getElementById('test-send').addEventListener('click', sendTestCommand);
 document.getElementById('test-input').addEventListener('keydown', (e) => {
@@ -262,3 +276,44 @@ async function sendTestCommand() {
 
 // ─── Init ─────────────────────────────────────────────────────────
 connect();
+
+// ─── Theme Toggling ───────────────────────────────────────────────
+const themeToggleBtn = document.getElementById('theme-toggle');
+if (themeToggleBtn) {
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+}
+
+// ─── Easter Egg ───────────────────────────────────────────────────
+let typedKeys = '';
+const secretWord = 'omiclaw';
+
+document.addEventListener('keydown', (e) => {
+  // Ignore typing inside inputs
+  if (e.target.tagName.toLowerCase() === 'input') return;
+
+  typedKeys += e.key.toLowerCase();
+  
+  // Keep only the last N characters where N is length of secretWord
+  if (typedKeys.length > secretWord.length) {
+    typedKeys = typedKeys.slice(-secretWord.length);
+  }
+
+  if (typedKeys === secretWord) {
+    document.documentElement.setAttribute('data-theme', 'low-cortisol');
+    localStorage.setItem('theme', 'low-cortisol');
+    typedKeys = ''; // reset
+  }
+});
