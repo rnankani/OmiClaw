@@ -44,6 +44,30 @@
   background-attachment: fixed;
 }
 
+[data-theme="high-cortisol"] {
+  /* Fiery High Cortisol Mode */
+  --bg: #2a0000;
+  --bg-gradient: none; 
+  --surface: rgba(40, 0, 0, 0.85); 
+  --surface-alt: rgba(80, 0, 0, 0.9); 
+  --border: rgba(255, 0, 0, 0.5);
+  --text: #ffffff; 
+  --text-heading: #ff6666;
+  --muted: #ff9999;
+  --accent: #ff0000; 
+  --accent-light: rgba(255, 0, 0, 0.2);
+  --green: #ff0000; /* everything is red/panic */
+  --yellow: #ff4500;
+  --red: #ff0000;
+}
+
+[data-theme="high-cortisol"] body {
+  background-image: linear-gradient(rgba(255, 0, 0, 0.3), rgba(255, 0, 0, 0.5)), url('high_cortisol.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
 [data-theme="dark"] {
   /* Dark Mode Palette */
   --bg: #2a2a2e; /* Greyish background */
@@ -80,6 +104,13 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Harder red frosted glass blur for high-cortisol mode */
+[data-theme="high-cortisol"] .app-wrapper {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(40, 0, 0, 0.5);
 }
 
 /* Global Body Rules */
@@ -471,25 +502,27 @@ h1 {
   border: 1px solid var(--border);
 }
 
-.input-container:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-light);
-  background: var(--surface);
-}
-
-#test-input {
-  flex: 1;
+.input-container.voice-only {
+  justify-content: center;
   background: transparent;
   border: none;
-  outline: none;
-  font-size: 16px; 
-  color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  min-width: 0; 
+  padding: 0;
 }
 
-#test-input::placeholder {
-  color: var(--muted);
+.input-container.voice-only .voice-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--text-heading);
+  color: var(--bg);
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-container.voice-only .voice-btn:active {
+  transform: scale(0.9);
+  background: var(--accent);
 }
 
 .icon-button {

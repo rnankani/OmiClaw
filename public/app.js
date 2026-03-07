@@ -250,29 +250,7 @@ if (reasoningToggle) {
   });
 }
 
-document.getElementById('test-send').addEventListener('click', sendTestCommand);
-document.getElementById('test-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') sendTestCommand();
-});
 
-async function sendTestCommand() {
-  const input = document.getElementById('test-input');
-  const text = input.value.trim();
-  if (!text) return;
-
-  input.value = '';
-  addMessage('user', text);
-
-  try {
-    await fetch('/test/command', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-  } catch (err) {
-    addMessage('system', `Send failed: ${err.message}`);
-  }
-}
 
 // ─── Init ─────────────────────────────────────────────────────────
 connect();
@@ -299,21 +277,25 @@ if (themeToggleBtn) {
 // ─── Easter Egg ───────────────────────────────────────────────────
 let typedKeys = '';
 const secretWord = 'omiclaw';
+const highStressWord = 'highcortisol';
 
 document.addEventListener('keydown', (e) => {
-  // Ignore typing inside inputs
   if (e.target.tagName.toLowerCase() === 'input') return;
 
   typedKeys += e.key.toLowerCase();
   
-  // Keep only the last N characters where N is length of secretWord
-  if (typedKeys.length > secretWord.length) {
-    typedKeys = typedKeys.slice(-secretWord.length);
+  const maxLen = Math.max(secretWord.length, highStressWord.length);
+  if (typedKeys.length > maxLen) {
+    typedKeys = typedKeys.slice(-maxLen);
   }
 
-  if (typedKeys === secretWord) {
+  if (typedKeys.endsWith(secretWord)) {
     document.documentElement.setAttribute('data-theme', 'low-cortisol');
     localStorage.setItem('theme', 'low-cortisol');
-    typedKeys = ''; // reset
+    typedKeys = ''; 
+  } else if (typedKeys.endsWith(highStressWord)) {
+    document.documentElement.setAttribute('data-theme', 'high-cortisol');
+    localStorage.setItem('theme', 'high-cortisol');
+    typedKeys = '';
   }
 });
