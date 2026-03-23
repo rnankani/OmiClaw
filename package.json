@@ -1,7 +1,7 @@
 {
-  "name": "omiclaw-server",
+  "name": "classflow-server",
   "version": "1.0.0",
-  "description": "OmiClaw - Omi Smart Glasses + OpenClaw + Vapi + ElevenLabs",
+  "description": "ClassFlow - Omi Smart Glasses + OpenClaw + Vapi + ElevenLabs",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

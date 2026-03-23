@@ -1,4 +1,4 @@
-# OmiClaw Architecture Overview
+# ClassFlow Architecture Overview
 
 ## System Components
 
@@ -11,7 +11,7 @@
                        │ {segments: [{text: "Hey Claw, book..."}]}
                        ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│              OmiClaw Server (Node.js + Express)                   │
+│              ClassFlow Server (Node.js + Express)                   │
 │                                                                   │
 │  1. Receive webhook from Omi                                     │
 │  2. Extract transcript segments                                  │
@@ -160,29 +160,29 @@ Agent response text:
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | Omi Glasses | Smart glasses | Captures user voice & camera |
-| OmiClaw Server | Node.js + Express | Webhook receiver, orchestrator |
+| ClassFlow Server | Node.js + Express | Webhook receiver, orchestrator |
 | OpenClaw Gateway | Python WebSocket | AI agent backend |
 | SOUL.md | Personality config | Agent instructions for booking |
 | Vapi | Phone API | Makes actual phone calls |
 | ElevenLabs | TTS API | Converts text to speech |
 | Judge UI | HTML5 + WebSocket | Real-time demo dashboard |
-| Cloudflare Tunnel | Reverse proxy | Public URL: omiclaw.essaylens.app |
+| Cloudflare Tunnel | Reverse proxy | Public URL: classflow.essaylens.app |
 
 ## Deployment Flow
 
 ```
 Development:
   1. OpenClaw gateway: localhost:18789
-  2. OmiClaw server: localhost:3000
+  2. ClassFlow server: localhost:3000
   3. Judge UI: localhost:3000 (served by server)
   4. Test via curl or test controls (T key)
 
 Demo (StangHacks):
   1. OpenClaw gateway: Same machine (ws://127.0.0.1:18789)
-  2. OmiClaw server: PORT=3000 node server.js
-  3. Cloudflare tunnel: cloudflared tunnel run omiclaw
-     → Maps localhost:3000 → https://omiclaw.essaylens.app
-  4. Omi app registered with webhook: https://omiclaw.essaylens.app/omi/webhook
+  2. ClassFlow server: PORT=3000 node server.js
+  3. Cloudflare tunnel: cloudflared tunnel run classflow
+     → Maps localhost:3000 → https://classflow.essaylens.app
+  4. Omi app registered with webhook: https://classflow.essaylens.app/omi/webhook
   5. User puts on glasses, speaks "Hey Claw..."
   6. Live demo to judges via Judge UI browser
 
@@ -196,8 +196,8 @@ Required Environment:
 ## Error Handling
 
 ### If Omi webhooks don't arrive:
-- Check public URL is accessible: `curl https://omiclaw.essaylens.app/health`
-- Verify tunnel is running: `cloudflared tunnel --protocol http2 run omiclaw`
+- Check public URL is accessible: `curl https://classflow.essaylens.app/health`
+- Verify tunnel is running: `cloudflared tunnel --protocol http2 run classflow`
 - Confirm webhook URL in Omi app settings
 
 ### If OpenClaw doesn't respond:

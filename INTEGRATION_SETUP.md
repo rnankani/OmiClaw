@@ -1,6 +1,6 @@
-# OmiClaw Integration App Setup Guide
+# ClassFlow Integration App Setup Guide
 
-OmiClaw is configured to work as an **Omi External Integration App**. This means Omi sends webhook events to your server, which processes them through OpenClaw and sends responses back to the glasses.
+ClassFlow is configured to work as an **Omi External Integration App**. This means Omi sends webhook events to your server, which processes them through OpenClaw and sends responses back to the glasses.
 
 ## How It Works
 
@@ -9,7 +9,7 @@ Omi Glasses (user speaks "Hey Claw")
         ↓
 POST /omi/webhook?uid={uid}  (transcript segments)
         ↓
-omiclaw-server (detects "Hey Claw", strips it)
+classflow-server (detects "Hey Claw", strips it)
         ↓
 OpenClaw Gateway (processes command via websocket)
         ↓
@@ -24,15 +24,15 @@ Judge UI → broadcast to WebSocket clients
 
 ### 1. Get Your Public URL
 
-OmiClaw needs a public URL that Omi can reach. You're using Cloudflare tunnel:
+ClassFlow needs a public URL that Omi can reach. You're using Cloudflare tunnel:
 
 ```bash
 # Terminal 1: Start the tunnel
-cloudflared tunnel --protocol http2 run omiclaw
-# This gives you: https://omiclaw.essaylens.app
+cloudflared tunnel --protocol http2 run classflow
+# This gives you: https://classflow.essaylens.app
 ```
 
-### 2. Create OmiClaw as an Integration App
+### 2. Create ClassFlow as an Integration App
 
 In the Omi backend, create a new integration app:
 
@@ -40,14 +40,14 @@ In the Omi backend, create a new integration app:
 # You'll need access to Omi admin dashboard or API
 # Create app with these settings:
 
-Name: OmiClaw
+Name: ClassFlow
 Category: Utilities & Tools
 Description: AI assistant for making phone reservations
 Icon: (upload)
 
 External Integration Config:
 {
-  "webhook_url": "https://omiclaw.essaylens.app/omi/webhook",
+  "webhook_url": "https://classflow.essaylens.app/omi/webhook",
   "triggers_on": "realtime_transcript",
   "auth_steps": [
     {
@@ -79,7 +79,7 @@ OMI_APP_SECRET=your_app_secret_here
 In the Omi app settings, set the webhook to route to your handler:
 
 ```
-POST https://omiclaw.essaylens.app/omi/webhook
+POST https://classflow.essaylens.app/omi/webhook
 ```
 
 The server has these endpoints:
@@ -97,12 +97,12 @@ openclaw  # Should be running on ws://127.0.0.1:18789
 
 **Terminal 2: Cloudflare Tunnel**
 ```bash
-cloudflared tunnel --protocol http2 run omiclaw
+cloudflared tunnel --protocol http2 run classflow
 ```
 
-**Terminal 3: OmiClaw Server**
+**Terminal 3: ClassFlow Server**
 ```bash
-cd ~/omiclaw-server
+cd ~/classflow-server
 PORT=3000 node server.js
 ```
 
@@ -195,7 +195,7 @@ ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
 ## Troubleshooting
 
 ### Webhooks not arriving?
-1. Check tunnel is running: `cloudflared tunnel --protocol http2 run omiclaw`
+1. Check tunnel is running: `cloudflared tunnel --protocol http2 run classflow`
 2. Verify URL in Omi app settings points to public tunnel URL
 3. Check server logs for incoming requests
 4. Verify wake word detection with test command (T key on judge UI)
@@ -218,7 +218,7 @@ ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
 ## Next Steps
 
 1. **Get VAPI_PHONE_NUMBER_ID** - Login to Vapi dashboard, copy your phone number ID
-2. **Create OmiClaw in Omi admin** - Register as external integration app
+2. **Create ClassFlow in Omi admin** - Register as external integration app
 3. **Get OMI_APP_ID and OMI_APP_SECRET** - From Omi app creation
 4. **Update .env** with all credentials
 5. **Start the stack** following Terminal 1-4 above
@@ -234,4 +234,4 @@ ELEVENLABS_VOICE_ID=21m00Tcm4TlvDq8ikWAM
 
 ---
 
-**OmiClaw is ready to demo!** 🎯
+**ClassFlow is ready to demo!** 🎯

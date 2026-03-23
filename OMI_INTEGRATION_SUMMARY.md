@@ -11,8 +11,8 @@ Omi integrations are **webhook receivers** — your app registers a URL, and Omi
 
 ```
 1. Omi App Registration
-   - Name: OmiClaw
-   - Webhook URL: https://omiclaw.essaylens.app/omi/webhook
+   - Name: ClassFlow
+   - Webhook URL: https://classflow.essaylens.app/omi/webhook
    - Trigger: realtime_transcript (or memory_creation)
 
 2. User Interaction
@@ -20,7 +20,7 @@ Omi integrations are **webhook receivers** — your app registers a URL, and Omi
    - Omi detects speech → sends POST to your webhook
 
 3. Webhook Payload
-   POST https://omiclaw.essaylens.app/omi/webhook?uid=user123
+   POST https://classflow.essaylens.app/omi/webhook?uid=user123
    {
      "segments": [
        { "text": "Hey Claw, book a table...", "is_user": true }
@@ -53,9 +53,9 @@ Omi integrations are **webhook receivers** — your app registers a URL, and Omi
 - ✅ Can receive and play audio responses
 - ❌ Don't have a screen (so your app never displays UI)
 
-This is why OmiClaw works perfectly as a webhook receiver — it listens for voice commands and responds with audio.
+This is why ClassFlow works perfectly as a webhook receiver — it listens for voice commands and responds with audio.
 
-## OmiClaw's Implementation
+## ClassFlow's Implementation
 
 Your server already does this correctly:
 
@@ -90,7 +90,7 @@ if (text.toLowerCase().includes('hey claw')) {
 ### From Omi (Omi Admin Dashboard)
 - `OMI_APP_ID` - Your app's unique ID
 - `OMI_APP_SECRET` - For server-to-server calls
-- Webhook URL approved: `https://omiclaw.essaylens.app/omi/webhook`
+- Webhook URL approved: `https://classflow.essaylens.app/omi/webhook`
 
 ### From Other Services
 - `OPENCLAW_GATEWAY_TOKEN` - Your OpenClaw session token ✓ (already have)
@@ -100,15 +100,15 @@ if (text.toLowerCase().includes('hey claw')) {
 
 ## Setup Checklist
 
-- [ ] Create OmiClaw as integration app in Omi admin
-- [ ] Set webhook_url to: `https://omiclaw.essaylens.app/omi/webhook`
+- [ ] Create ClassFlow as integration app in Omi admin
+- [ ] Set webhook_url to: `https://classflow.essaylens.app/omi/webhook`
 - [ ] Enable trigger: `realtime_transcript`
 - [ ] Get OMI_APP_ID and OMI_APP_SECRET
 - [ ] Generate API key (for optional webhook verification)
 - [ ] Add credentials to `.env`
 - [ ] Start OpenClaw gateway: `openclaw`
-- [ ] Start Cloudflare tunnel: `cloudflared tunnel --protocol http2 run omiclaw`
-- [ ] Start server: `cd ~/omiclaw-server && node server.js`
+- [ ] Start Cloudflare tunnel: `cloudflared tunnel --protocol http2 run classflow`
+- [ ] Start server: `cd ~/classflow-server && node server.js`
 - [ ] Test with glasses: "Hey Claw, book me a table..."
 - [ ] Judge UI shows real-time updates: http://localhost:3000
 
@@ -177,7 +177,7 @@ All happening live, all from voice, all working!
 ## Next Action Items
 
 1. **Get VAPI_PHONE_NUMBER_ID** from Vapi dashboard
-2. **Create OmiClaw app** in Omi admin → Get OMI_APP_ID and OMI_APP_SECRET
+2. **Create ClassFlow app** in Omi admin → Get OMI_APP_ID and OMI_APP_SECRET
 3. **Update .env** with new credentials
 4. **Demo at StangHacks!**
 

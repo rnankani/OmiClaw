@@ -87,7 +87,7 @@ function connectGateway() {
             maxProtocol: 3,
             client: {
               id: 'gateway-client',
-              displayName: 'OmiClaw',
+              displayName: 'ClassFlow',
               version: '1.0.0',
               platform: 'darwin',
               mode: 'backend',
@@ -663,8 +663,8 @@ server.on('error', (err) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n  OmiClaw Server running on http://localhost:${PORT}`);
-  console.log(`  Tunnel: https://omiclaw.essaylens.app`);
+  console.log(`\n  ClassFlow Server running on http://localhost:${PORT}`);
+  console.log(`  Tunnel: https://classflow.essaylens.app`);
   console.log(`  Gateway: ${GATEWAY_URL}\n`);
 
   // Connect to OpenClaw Gateway
