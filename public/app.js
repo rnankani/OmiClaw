@@ -294,7 +294,7 @@ if (themeToggleBtn) {
 
 // ─── Easter Egg ───────────────────────────────────────────────────
 let typedKeys = '';
-const secretWord = 'omiclaw';
+const secretWord = 'classflow';
 const highStressWord = 'highcortisol';
 
 document.addEventListener('keydown', (e) => {

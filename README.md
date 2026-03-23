@@ -1,6 +1,6 @@
-# OmiClaw 
+# ClassFlow
 
-OmiClaw is a single-column, mobile-first AI Agent dashboard designed to run seamlessly in any browser. It bridges Omi Smart Glasses with the OpenClaw architecture, Vapi for AI voice calls, and ElevenLabs for text-to-speech, acting as a complete hub for your personal AI assistant.
+ClassFlow is a single-column, mobile-first AI Agent dashboard designed to run seamlessly in any browser. It bridges Omi Smart Glasses with the OpenClaw architecture, Vapi for AI voice calls, and ElevenLabs for text-to-speech, acting as a complete hub for your personal AI assistant.
 
 ## Features
 
@@ -14,12 +14,12 @@ OmiClaw is a single-column, mobile-first AI Agent dashboard designed to run seam
 - **Multiple Color Themes**:
   - **Cream Light Mode**: Warm ivory surfaces over soft cream backgrounds.
   - **Greyish Dark Mode**: Easy on the eyes at night, featuring dark slates and white typography.
-  - **Low Cortisol Mode (Easter Egg)**: Type the secret word `omiclaw` anywhere on the page to instantly transform the app into a full-screen, leafy, relaxing green environment. The chat remains perfectly readable over a frosted white glass overlay.
+  - **Low Cortisol Mode (Easter Egg)**: Type the secret word `classflow` anywhere on the page to instantly transform the app into a full-screen, leafy, relaxing green environment. The chat remains perfectly readable over a frosted white glass overlay.
 - **Integrated Voice/Text Input**: Features a fixed bottom input bar for chatting seamlessly while reading streams above.
 
 ## Prerequisites
 
-To run OmiClaw locally, you need a few API keys to power the AI backend services:
+To run ClassFlow locally, you need a few API keys to power the AI backend services:
 - **OpenClaw Gateway Token**
 - **Vapi API Key & Phone Number ID**
 - **ElevenLabs API Key & Voice ID**
@@ -29,8 +29,8 @@ To run OmiClaw locally, you need a few API keys to power the AI backend services
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/OmiClaw.git
-   cd OmiClaw
+   git clone https://github.com/smaranz/classflow.git
+   cd ClassFlow
    ```
 
 2. **Install Dependencies**
@@ -59,12 +59,12 @@ To run OmiClaw locally, you need a few API keys to power the AI backend services
 
 The design system runs purely on CSS variables located at the top of `public/style.css`.
 - **Toggle Themes**: Click the Sun/Moon icon in the top right to switch between Cream and Dark modes.
-- **Hidden Relaxing Mode**: Type `omiclaw` (not inside an input field) to activate the leafy, low stress background mode. Type it again or click the Sun/Moon icon to disable it.
+- **Hidden Relaxing Mode**: Type `classflow` (not inside an input field) to activate the leafy, low stress background mode. Type it again or click the Sun/Moon icon to disable it.
 
 ## Directory Structure
 
 ```
-OmiClaw/
+ClassFlow/
 ├── .env                # Secret API configuration
 ├── server.js           # Express API and SSE setup
 ├── package.json        
